@@ -1,0 +1,35 @@
+{
+    "name": "ra-data-strapi",
+    "version": "0.0.1",
+    "description": "Strapi data provider for react-admin",
+    "main": "lib/index.js",
+    "module": "esm/index.js",
+    "sideEffects": false,
+    "files": [
+        "*.md",
+        "lib",
+        "esm",
+        "src"
+    ],
+    "authors": [
+        "Hiber"
+    ],
+    "repository": "hiber/ra-data-strapi",
+    "homepage": "https://github.com/hiber/ra-data-strapi#readme",
+    "bugs": "https://github.com/hiber/ra-data-strapi/issues",
+    "license": "MIT",
+    "scripts": {
+        "build": "yarn run build-cjs && yarn run build-esm",
+        "build-cjs": "rimraf ./lib && tsc",
+        "build-esm": "rimraf ./esm && tsc --outDir esm --module es2015",
+        "watch": "rimraf ./lib && tsc --watch"
+    },
+    "dependencies": {
+        "query-string": "~5.1.1",
+        "ra-core": "^2.9.0"
+    },
+    "devDependencies": {
+        "cross-env": "^5.2.0",
+        "rimraf": "^2.6.2"
+    }
+}
