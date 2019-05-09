@@ -40,8 +40,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 const { field, order } = params.sort;
                 const query = {
                     ...fetchUtils.flattenObject(params.filter),
-                    _sort: field,
-                    _order: order,
+                    _sort: field + ':' + order,
                     _start: (page - 1) * perPage,
                     _limit: perPage,
                 };
@@ -57,10 +56,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 const query = {
                     ...fetchUtils.flattenObject(params.filter),
                     [params.target]: params.id,
-                    _sort: field,
-                    _order: order,
+                    _sort: field + ':' + order,
                     _start: (page - 1) * perPage,
-                    _end: page * perPage,
+                    _limit: perPage,
                 };
                 url = `${apiUrl}/${resource}?${stringify(query)}`;
                 break;
@@ -104,21 +102,14 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         switch (type) {
             case GET_LIST:
             case GET_MANY_REFERENCE:
-                if (!headers.has('x-total-count')) {
-                    throw new Error(
-                        'The X-Total-Count header is missing in the HTTP Response. The jsonServer Data Provider expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?'
-                    );
-                }
-                return {
-                    data: json,
-                    total: parseInt(
-                        headers
-                            .get('x-total-count')
-                            .split('/')
-                            .pop(),
-                        10
-                    ),
-                };
+                return httpClient(`${apiUrl}/${resource}/count?${stringify(fetchUtils.flattenObject(params.filter))}`, {
+                    method: 'GET'
+                 }).then(response => {
+                    return {
+                        data: json,
+                        total: response.json
+                    };
+                 });         
             case CREATE:
                 return { data: { ...params.data, id: json.id } };
             default:
