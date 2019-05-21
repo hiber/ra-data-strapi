@@ -38,12 +38,14 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case GET_LIST: {
                 const { page, perPage } = params.pagination;
                 const { field, order } = params.sort;
+                const { q, ...filter } = params.filter;
                 const query = {
-                    ...fetchUtils.flattenObject(params.filter),
+                    ...fetchUtils.flattenObject(filter),
                     _sort: field + ':' + order,
                     _start: (page - 1) * perPage,
                     _limit: perPage,
                 };
+                if (q) query['_q'] = q;
                 url = `${apiUrl}/${resource}?${stringify(query)}`;
                 break;
             }
@@ -79,7 +81,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 break;
             case GET_MANY: {
                 const query = {
-                    id: params.ids,
+                    _id_in: params.ids.map(id => typeof id === 'string' ? id : id.id),
                 };
                 url = `${apiUrl}/${resource}?${stringify(query)}`;
                 break;
@@ -102,14 +104,16 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         switch (type) {
             case GET_LIST:
             case GET_MANY_REFERENCE:
-                return httpClient(`${apiUrl}/${resource}/count?${stringify(fetchUtils.flattenObject(params.filter))}`, {
+                const { q, ...filter } = params.filter;
+                if (q) filter['_q'] = q;
+                return httpClient(`${apiUrl}/${resource}/count?${stringify(fetchUtils.flattenObject(filter))}`, {
                     method: 'GET'
                  }).then(response => {
                     return {
                         data: json,
                         total: response.json
                     };
-                 });         
+                 });
             case CREATE:
                 return { data: { ...params.data, id: json.id } };
             default:
