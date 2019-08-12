@@ -1,6 +1,6 @@
 {
     "name": "ra-data-strapi",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Strapi data provider for react-admin",
     "main": "src/index.js",
     "module": "src/index.js",
@@ -25,11 +25,13 @@
         "watch": "rimraf ./lib && tsc --watch"
     },
     "dependencies": {
-        "query-string": "~5.1.1",
-        "ra-core": "~2.9.0"
+        "query-string": "~5.1.1"   
     },
     "devDependencies": {
         "cross-env": "^5.2.0",
         "rimraf": "^2.6.2"
+    },
+    "peerDependencies": {
+        "ra-core": "~2.9.0 || ^3.0.0-alpha.2"
     }
 }
